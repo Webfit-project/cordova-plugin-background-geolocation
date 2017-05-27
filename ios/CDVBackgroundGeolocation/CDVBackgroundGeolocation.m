@@ -326,10 +326,12 @@
 {
     [self.commandDelegate runInBackground:^{
         DDLogError(@"CDVBackgroundGeolocation onError");
+        /* fast fix for bug callback 
         CDVPluginResult* result = nil;
         result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:[error userInfo]];
         [result setKeepCallbackAsBool:YES];
         [self.commandDelegate sendPluginResult:result callbackId:syncCallbackId];
+        */
     }];
 }
 
