@@ -29,6 +29,7 @@ public class Config implements Parcelable
 {
   public static final int ANDROID_DISTANCE_FILTER_PROVIDER = 0;
   public static final int ANDROID_ACTIVITY_PROVIDER = 1;
+  public static final int ANDROID_WEBFIT_PROVIDER = 2;
 
   // actual values should be read from strings.xml
   public static final String ACCOUNT_TYPE_RESOURCE = "account_type";

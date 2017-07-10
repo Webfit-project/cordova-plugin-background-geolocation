@@ -34,8 +34,12 @@ public class LocationProviderFactory {
                 provider = new DistanceFilterLocationProvider(context);
                 break;
             case Config.ANDROID_ACTIVITY_PROVIDER:
-                provider = new ActivityRecognitionLocationProvider(context);
-                break;
+              provider = new WebfitLocationProvider(context);
+            //provider = new ActivityRecognitionLocationProvider(context);
+            break;
+          case Config.ANDROID_WEBFIT_PROVIDER:
+            provider = new WebfitLocationProvider(context);
+            break;
             default:
                 throw new IllegalArgumentException("Provider not found");
         }
