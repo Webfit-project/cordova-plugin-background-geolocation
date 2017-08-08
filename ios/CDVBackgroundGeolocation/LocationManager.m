@@ -279,6 +279,7 @@ enum {
         [self stopMonitoringForRegion];
         [self stopMonitoringSignificantLocationChanges];
     } else if (operationMode == BACKGROUND) {
+        
         isAcquiringSpeed = NO;
         isAcquiringStationaryLocation = YES;
         [self startMonitoringSignificantLocationChanges];
@@ -384,7 +385,7 @@ enum {
 {
     // Sanity-check the duration of last bgTask:  If greater than 30s, kill it.
     if (bgTask != UIBackgroundTaskInvalid) {
-        if (-[lastBgTaskAt timeIntervalSinceNow] > 30.0) {
+        if (-[lastBgTaskAt timeIntervalSinceNow] > 0.0) {
             DDLogWarn(@"LocationManager#flushQueue has to kill an out-standing background-task!");
             if (_config.isDebugging) {
                 [self notify:@"Outstanding bg-task was force-killed"];
@@ -534,24 +535,30 @@ enum {
         // test the age of the location measurement to determine if the measurement is cached
         // in most cases you will not want to rely on cached measurements
         if ([bgloc locationAge] > maxLocationAgeInSeconds || ![bgloc hasAccuracy] || ![bgloc hasTime]) {
+            
             continue;
         }
 
         if (bestLocation == nil) {
+           
             bestLocation = bgloc;
             continue;
         }
 
         if ([bgloc isBetterLocation:bestLocation]) {
             DDLogInfo(@"Better location found: %@", bgloc);
+            
             bestLocation = bgloc;
         }
     }
 
     if (bestLocation == nil) {
+        DDLogDebug(@"pas de best location");
         return;
     }
 
+    
+    
     // test the measurement to see if it is more accurate than the previous measurement
     if (isAcquiringStationaryLocation) {
         DDLogDebug(@"Acquiring stationary location, accuracy: %@", bestLocation.accuracy);
@@ -563,6 +570,7 @@ enum {
             DDLogDebug(@"LocationManager found most accurate stationary before timeout");
         } else if (-[aquireStartTime timeIntervalSinceNow] < maxLocationWaitTimeInSeconds) {
             // we still have time to aquire better location
+            DDLogDebug(@"encore le temps pour une meilleur geoloc");
             return;
         }
 
@@ -593,24 +601,27 @@ enum {
         // We should have a good sample for speed now, power down our GPS as configured by user.
         isAcquiringSpeed = NO;
         locationManager.desiredAccuracy = _config.desiredAccuracy;
-        locationManager.distanceFilter = [self calculateDistanceFilter:[bestLocation.speed floatValue]];
+       // locationManager.distanceFilter = [self calculateDistanceFilter:[bestLocation.speed floatValue]];
         [self startUpdatingLocation];
 
     } else if (actAsInMode == FOREGROUND) {
         // Adjust distanceFilter incrementally based upon current speed
+        
         float newDistanceFilter = [self calculateDistanceFilter:[bestLocation.speed floatValue]];
         if (newDistanceFilter != locationManager.distanceFilter) {
             DDLogInfo(@"LocationManager updated distanceFilter, new: %f, old: %f", newDistanceFilter, locationManager.distanceFilter);
             locationManager.distanceFilter = newDistanceFilter;
             [self startUpdatingLocation];
+         
         }
+     
     } else if ([self locationIsBeyondStationaryRegion:bestLocation]) {
         if (_config.isDebugging) {
             [self notify:@"Manual stationary exit-detection"];
         }
         [self switchMode:operationMode];
     }
-
+ 
     [self queue:bestLocation];
 }
 
